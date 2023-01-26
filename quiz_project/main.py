@@ -1,6 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 
 import os
@@ -66,14 +65,14 @@ def update_question(question_id: int, question: schemas.QuestionCreate, db: Sess
     return crud.update_question_by_id(db=db, question=question, question_id=question_id)
 
 
-@app.delete("/questions/{question_id}/")
-def delete_question(question_id: int, db: Session = Depends(get_db)):
-    return crud.delete_question(db=db, question_id=question_id)
-
-
 @app.delete("/questions/all/")
 def delete_questions(db: Session = Depends(get_db)):
     return crud.delete_questions(db=db)
+
+
+@app.delete("/questions/{question_id}/")
+def delete_question(question_id: int, db: Session = Depends(get_db)):
+    return crud.delete_question(db=db, question_id=question_id)
 
 
 @app.post("/answer/", response_model=schemas.Answer)
@@ -81,9 +80,14 @@ def create_answer(answer: schemas.AnswerCreate, db: Session = Depends(get_db)):
     return crud.create_answer(db=db, answer=answer)
 
 
-@app.get("/answer/{question_id}/")
+@app.get("/answer/question/{question_id}/")
 def get_answers_by_question_id(question_id: int, db: Session = Depends(get_db)):
     return crud.get_answers_by_question_id(db=db, question_id=question_id)
+
+
+@app.get("/answer/team/{team_id}/")
+def get_answers_by_team_id(team_id: int, db: Session = Depends(get_db)):
+    return crud.get_answers_by_team_id(db=db, team_id=team_id)
 
 
 @app.patch("/score/{team_id}")
@@ -116,12 +120,14 @@ def update_team_by_id(team_id: int, team: schemas.TeamCreate, db: Session = Depe
     return crud.update_team_by_id(db=db, team_id=team_id, team=team)
 
 
+@app.delete("/teams/all/")
+def delete_teams(db: Session = Depends(get_db)):
+    return crud.delete_teams(db=db)
+
+
 @app.delete("/teams/{team_id}/")
 def delete_team_by_id(team_id: int, db: Session = Depends(get_db)):
     return crud.delete_team_by_id(db=db, team_id=team_id)
 
 
-@app.delete("/teams/all/")
-def delete_teams(db: Session = Depends(get_db)):
-    return crud.delete_teams(db=db)
 

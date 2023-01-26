@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import update
+from sqlalchemy import update, delete
 
 
 import models
@@ -50,8 +50,7 @@ def delete_question(db: Session, question_id: int):
 
 
 def delete_questions(db: Session):
-    db_questions = db.query(models.Question).all()
-    db.delete(db_questions)
+    db.query(models.Question).delete()
     db.commit()
     return {"All questions have been deleted": True}
 
@@ -99,8 +98,7 @@ def delete_team_by_id(db: Session, team_id: int):
 
 
 def delete_teams(db: Session):
-    db_teams = db.query(models.Team).all()
-    db.delete(db_teams)
+    db.query(models.Team).delete()
     db.commit()
     return {"All teams have been deleted": True}
 
@@ -115,6 +113,10 @@ def create_answer(db: Session, answer: schemas.AnswerCreate):
 
 def get_answers_by_question_id(db: Session, question_id: int):
     return db.query(models.Answer).filter(models.Answer.question_id == question_id).all()
+
+
+def get_answers_by_team_id(db: Session, team_id: int):
+    return db.query(models.Answer).filter(models.Answer.team_id == team_id).all()
 
 
 def update_score_by_team_id(db: Session, team_id: int, score: int):
