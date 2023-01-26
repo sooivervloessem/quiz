@@ -1,72 +1,53 @@
 from pydantic import BaseModel
 
 
-class ListenerSongBase(BaseModel):
-    pass
-
-
-class ListenerSongCreate(ListenerSongBase):
-    pass
-
-
-class ListenerSong(ListenerSongBase):
-    id: int
-    listener_id: int
-    song_id: int
-
-    class Config:
-        orm_mode = True
-
-
-class SongBase(BaseModel):
-    title: str
-    artist: str
-    album: str | None = None
-    release_date: str | None = None
-
-
-class SongCreate(SongBase):
-    pass
-
-
-class Song(SongBase):
-    id: int
-    kpop_group_id: int
-
-    listeners: list[ListenerSong] = []
-
-    class Config:
-        orm_mode = True
-
-
-class UserBase(BaseModel):
-    email: str
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-    is_active: bool
-    songs: list[ListenerSong] = []
-
-    class Config:
-        orm_mode = True
-
-
-class KpopGroupBase(BaseModel):
+class TeamBase(BaseModel):
     name: str
+    score: int
 
 
-class KpopGroupCreate(KpopGroupBase):
+class TeamCreate(TeamBase):
     pass
 
 
-class KpopGroup(KpopGroupBase):
+class Team(TeamBase):
     id: int
-    songs: list[Song] = []
+
+    class Config:
+        orm_mode = True
+
+
+class QuestionBase(BaseModel):
+    question: str
+    A_field: str
+    B_field: str
+    C_field: str
+    D_field: str
+
+
+class QuestionCreate(QuestionBase):
+    solution: str
+
+
+class Question(QuestionBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class AnswerBase(BaseModel):
+    team_id: int
+    question_id: int
+    answer: str
+
+
+class AnswerCreate(AnswerBase):
+    pass
+
+
+class Answer(AnswerBase):
+    id: int
 
     class Config:
         orm_mode = True

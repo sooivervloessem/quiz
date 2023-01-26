@@ -4,46 +4,30 @@ from sqlalchemy.orm import relationship
 from database import Base
 
 
-class User(Base):
-    __tablename__ = "users"
+class Team(Base):
+    __tablename__ = "teams"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-
-    songs = relationship("ListenerSong", back_populates="listeners")
+    name = Column(String, index=True )
+    score = Column(Integer, index=True)
 
 
-class ListenerSong(Base):
-    __tablename__ = "listener_songs"
+class Question(Base):
+    __tablename__ = "questions"
 
     id = Column(Integer, primary_key=True, index=True)
-    listener_id = Column(Integer, ForeignKey("users.id"))
-    song_id = Column(Integer, ForeignKey("songs.id"))
-
-    listeners = relationship("User", back_populates="songs")
-    songs = relationship("Song", back_populates="listeners")
-
-
-class Song(Base):
-    __tablename__ = "songs"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    artist = Column(String, index=True)
-    album = Column(String, index=True)
-    release_date = Column(String, index=True)
-    kpop_group_id = Column(Integer, ForeignKey("kpop_groups.id"))
-
-    listeners = relationship("ListenerSong", back_populates="songs")
-    kpop_group = relationship("KpopGroup", back_populates="songs")
+    question = Column(String, index=True)
+    A_field = Column(String, index=True)
+    B_field = Column(String, index=True)
+    C_field = Column(String, index=True)
+    D_field = Column(String, index=True)
+    solution = Column(String, index=True)
 
 
-class KpopGroup(Base):
-    __tablename__ = "kpop_groups"
+class Answer(Base):
+    __tablename__ = "answers"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-
-    songs = relationship("Song", back_populates="kpop_group")
+    team_id = Column(Integer, index=True)
+    question_id = Column(Integer, index=True)
+    answer = Column(String, index=True)

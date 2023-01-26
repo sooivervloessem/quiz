@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 
-import auth
 import os
 import crud
 import models
@@ -22,8 +21,7 @@ print("Tables created.......")
 app = FastAPI()
 
 origins = [
-    "http://localhost:8000/",
-    "https://sooivervloessem-kpop-api.netlify.app"
+    "http://localhost:8000/"
 ]
 
 app.add_middleware(
@@ -44,103 +42,86 @@ def get_db():
         db.close()
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+@app.post("/questions/", response_model=schemas.Question)
+def create_question(question: schemas.QuestionCreate, db: Session = Depends(get_db)):
+    return crud.create_question(db=db, question=question)
 
 
-@app.post("/token")
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    # Try to authenticate the user
-    user = auth.authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    # Add the JWT case sub with the subject(user)
-    access_token = auth.create_access_token(
-        data={"sub": user.email}
-    )
-    # Return the JWT as a bearer token to be placed in the headers
-    return {"access_token": access_token, "token_type": "bearer"}
+@app.get("/questions/", response_model=list[schemas.Question])
+def get_questions(db: Session = Depends(get_db)):
+    questions = crud.get_questions(db)
+    return questions
 
 
-@app.post("/users/", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_user(db=db, user=user)
+@app.get("/questions/{question_id}/", response_model=schemas.Question)
+def get_question_by_id(question_id: int, db: Session = Depends(get_db)):
+    db_question = crud.get_question_by_id(db, question_id=question_id)
+    if db_question is None:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return db_question
 
 
-@app.get("/users/", response_model=list[schemas.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    users = crud.get_users(db, skip=skip, limit=limit)
-    return users
+@app.put("/questions/{question_id}/", response_model=schemas.Question)
+def update_question(question_id: int, question: schemas.QuestionCreate, db: Session = Depends(get_db)):
+    return crud.update_question_by_id(db=db, question=question, question_id=question_id)
 
 
-@app.get("/users/me", response_model=schemas.User)
-def read_users_me(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    current_user = auth.get_current_active_user(db, token)
-    return current_user
+@app.delete("/questions/{question_id}/")
+def delete_question(question_id: int, db: Session = Depends(get_db)):
+    return crud.delete_question(db=db, question_id=question_id)
 
 
-@app.get("/users/{user_id}", response_model=schemas.User)
-def read_user(user_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    db_user = crud.get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+@app.delete("/questions/all/")
+def delete_questions(db: Session = Depends(get_db)):
+    return crud.delete_questions(db=db)
 
 
-@app.post("/listener/{listener_id}/{song_id}", response_model=schemas.ListenerSong)
-def link_listener_song(listener_song: schemas.ListenerSongCreate, listener_id: int, song_id: int, db: Session = Depends(get_db)):
-    return crud.create_user_song(db, listener_song=listener_song, listener_id=listener_id, song_id=song_id)
+@app.post("/answer/", response_model=schemas.Answer)
+def create_answer(answer: schemas.AnswerCreate, db: Session = Depends(get_db)):
+    return crud.create_answer(db=db, answer=answer)
 
 
-@app.post("/kpop_groups/", response_model=schemas.KpopGroup)
-def create_kpop_group(kpop_group: schemas.KpopGroupCreate, db: Session = Depends(get_db)):
-    return crud.create_kpop_group(db=db, kpop_group=kpop_group)
+@app.get("/answer/{question_id}/")
+def get_answers_by_question_id(question_id: int, db: Session = Depends(get_db)):
+    return crud.get_answers_by_question_id(db=db, question_id=question_id)
 
 
-@app.get("/kpop_groups/", response_model=list[schemas.KpopGroup])
-def read_kpop_groups(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    kpop_groups = crud.get_kpop_groups(db, skip=skip, limit=limit)
-    return kpop_groups
+@app.patch("/score/{team_id}")
+def update_score_by_team_id(team_id: int, score: int, db: Session = Depends(get_db)):
+    return crud.update_score_by_team_id(db=db, team_id=team_id, score=score)
 
 
-@app.get("/kpop_groups/{kpop_group_id}", response_model=schemas.KpopGroup)
-def read_kpop_group(kpop_group_id: int, db: Session = Depends(get_db)):
-    db_kpop_group = crud.get_kpop_group(db, kpop_group_id=kpop_group_id)
-    if db_kpop_group is None:
-        raise HTTPException(status_code=404, detail="Kpop group not found")
-    return db_kpop_group
+@app.get("/score/{team_id}/")
+def get_score_by_team_id(team_id: int, db: Session = Depends(get_db)):
+    return crud.get_score_by_team_id(db=db, team_id=team_id)
 
 
-@app.post("/kpop_groups/{kpop_group_id}/songs/", response_model=schemas.Song)
-def create_song_for_kpop_group(kpop_group_id: int, song: schemas.SongCreate, db: Session = Depends(get_db)):
-    return crud.create_song_kpopgroup(db=db, song=song, kpop_group_id=kpop_group_id)
+@app.post("/teams/")
+def create_team(team: schemas.TeamCreate, db: Session = Depends(get_db)):
+    return crud.create_team(db=db, team=team)
 
 
-@app.get("/songs/", response_model=list[schemas.Song])
-def read_songs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    songs = crud.get_songs(db, skip=skip, limit=limit)
-    return songs
+@app.get("/teams/")
+def get_teams(db: Session = Depends(get_db)):
+    return crud.get_teams(db=db)
 
 
-@app.get("/songs/{song_id}", response_model=schemas.Song)
-def read_song(song_id: int, db: Session = Depends(get_db)):
-    db_song = crud.get_songs_by_id(db, song_id=song_id)
-    if db_song is None:
-        raise HTTPException(status_code=404, detail="Song not found")
-    return db_song
+@app.get("/teams/{team_id}/")
+def get_team_by_id(team_id: int, db: Session = Depends(get_db)):
+    return crud.get_team_by_id(db=db, team_id=team_id)
 
 
-@app.put("/songs/{song_id}", response_model=schemas.Song)
-def update_song(song_id: int, song: schemas.SongCreate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    return crud.update_song_kpopgroup(db=db, song=song, song_id=song_id)
+@app.patch("/teams/{team_id}/")
+def update_team_by_id(team_id: int, team: schemas.TeamCreate, db: Session = Depends(get_db)):
+    return crud.update_team_by_id(db=db, team_id=team_id, team=team)
 
 
-@app.delete("/songs/{song_id}")
-def delete_song(song_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    return crud.delete_song_kpopgroup(db=db, song_id=song_id)
+@app.delete("/teams/{team_id}/")
+def delete_team_by_id(team_id: int, db: Session = Depends(get_db)):
+    return crud.delete_team_by_id(db=db, team_id=team_id)
+
+
+@app.delete("/teams/all/")
+def delete_teams(db: Session = Depends(get_db)):
+    return crud.delete_teams(db=db)
+
