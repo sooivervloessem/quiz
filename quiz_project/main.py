@@ -41,6 +41,15 @@ def get_db():
         db.close()
 
 
+#@app.on_event('startup')
+#def init_data(status: bool, question_id: int = 0):
+#    if status:
+#        current_question_id = question_id
+#    else:
+#    print(current_question_id)
+#    return current_question_id
+
+
 @app.post("/questions/", response_model=schemas.Question)
 def create_question(question: schemas.QuestionCreate, db: Session = Depends(get_db)):
     return crud.create_question(db=db, question=question)
@@ -57,6 +66,8 @@ def get_question_by_id(question_id: int, db: Session = Depends(get_db)):
     db_question = crud.get_question_by_id(db, question_id=question_id)
     if db_question is None:
         raise HTTPException(status_code=404, detail="Question not found")
+    global current_question_id
+    current_question_id = question_id
     return db_question
 
 
@@ -77,7 +88,7 @@ def delete_question(question_id: int, db: Session = Depends(get_db)):
 
 @app.post("/answer/", response_model=schemas.Answer)
 def create_answer(answer: schemas.AnswerCreate, db: Session = Depends(get_db)):
-    return crud.create_answer(db=db, answer=answer)
+    return crud.create_answer(db=db, answer=answer, question_id=current_question_id)
 
 
 @app.get("/answer/question/{question_id}/")
@@ -129,5 +140,12 @@ def delete_teams(db: Session = Depends(get_db)):
 def delete_team_by_id(team_id: int, db: Session = Depends(get_db)):
     return crud.delete_team_by_id(db=db, team_id=team_id)
 
+@app.get("/question_id/")
+def get_question_id(db: Session = Depends(get_db)):
+    return current_question_id
 
+
+#@app.put("/question_id/{question_id}/")
+#def update_question_id(question_id: int, db: Session = Depends(get_db)):
+#    return crud.update_question_id(db=db, question_id=question_id)
 

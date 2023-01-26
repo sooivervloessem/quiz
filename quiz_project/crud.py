@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import update, delete
 
-
 import models
 import schemas
 
@@ -103,8 +102,8 @@ def delete_teams(db: Session):
     return {"All teams have been deleted": True}
 
 
-def create_answer(db: Session, answer: schemas.AnswerCreate):
-    db_answer = models.Answer(team_id=answer.team_id, question_id=answer.question_id, answer=answer.answer)
+def create_answer(db: Session, answer: schemas.AnswerCreate, question_id: int):
+    db_answer = models.Answer(team_id=answer.team_id, question_id=question_id, answer=answer.answer)
     db.add(db_answer)
     db.commit()
     db.refresh(db_answer)

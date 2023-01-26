@@ -38,7 +38,7 @@ class Question(QuestionBase):
 
 class AnswerBase(BaseModel):
     team_id: int
-    question_id: int
+
     answer: str
 
 
@@ -48,6 +48,7 @@ class AnswerCreate(AnswerBase):
 
 class Answer(AnswerBase):
     id: int
+    question_id: int
 
     class Config:
         orm_mode = True

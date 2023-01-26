@@ -4,6 +4,9 @@ from sqlalchemy.orm import relationship
 from database import Base
 
 
+
+
+
 class Team(Base):
     __tablename__ = "teams"
 
