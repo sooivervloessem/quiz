@@ -11,7 +11,7 @@ def get_questions(db: Session):
 
 def create_question(db: Session, question: schemas.QuestionCreate):
     db_question = models.Question(question=question.question, A_field=question.A_field, B_field=question.B_field,
-                                  C_field=question.C_field, D_field=question.D_field)
+                                  C_field=question.C_field, D_field=question.D_field, solution=question.solution)
     db.add(db_question)
     db.commit()
     db.refresh(db_question)
