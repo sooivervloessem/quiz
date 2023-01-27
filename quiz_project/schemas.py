@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 class TeamBase(BaseModel):
     name: str
-    score: int
 
 
 class TeamCreate(TeamBase):
@@ -12,6 +11,7 @@ class TeamCreate(TeamBase):
 
 class Team(TeamBase):
     id: int
+    score: int
 
     class Config:
         orm_mode = True

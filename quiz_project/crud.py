@@ -59,7 +59,7 @@ def get_teams(db: Session):
 
 
 def create_team(db: Session, team: schemas.TeamCreate):
-    db_team = models.Team(name=team.name, score=team.score)
+    db_team = models.Team(name=team.name, score=0)
     db.add(db_team)
     db.commit()
     db.refresh(db_team)
@@ -103,6 +103,10 @@ def delete_teams(db: Session):
 
 
 def create_answer(db: Session, answer: schemas.AnswerCreate, question_id: int):
+    if answer.answer == getattr(db.get(models.Question, question_id), "solution"):
+        score = get_score_by_team_id(db=db, team_id=answer.team_id)[0]
+        score += 1
+        update_score_by_team_id(db=db, team_id=answer.team_id, score=score)
     db_answer = models.Answer(team_id=answer.team_id, question_id=question_id, answer=answer.answer)
     db.add(db_answer)
     db.commit()
@@ -119,7 +123,7 @@ def get_answers_by_team_id(db: Session, team_id: int):
 
 
 def update_score_by_team_id(db: Session, team_id: int, score: int):
-    db_score = db.get(models.Answer, team_id)
+    db_score = db.get(models.Team, team_id)
     setattr(db_score, "score", score)
     db.add(db_score)
     db.commit()
@@ -128,4 +132,4 @@ def update_score_by_team_id(db: Session, team_id: int, score: int):
 
 
 def get_score_by_team_id(db: Session, team_id: int):
-    return db.query(models.Team.score).filter(models.Team.team_id == team_id).all()
+    return db.query(models.Team.score).filter(models.Team.id == team_id).first()
