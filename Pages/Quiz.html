@@ -2,13 +2,72 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <link rel="stylesheet" href="../style.css">
-    <script defer src="https://unpkg.com/alpinejs@3.5.0/dist/cdn.min.js"></script>
-    <title>Quiz | Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quizmaster</title>
+    <script type="text/javascript" src="static/cdn.min.js">
+    </script>
+
 </head>
 <body>
+
+<h1>Quizmaster</h1>
+
+<div id="Question" x-data="{
+    id: 1,
+    question: null,
+    A_field: null,
+    B_field: null,
+    C_field: null,
+    D_field: null,
+    responsedata: null,
+
+    async getQuestionById() {
+      url = 'http://192.168.1.145:8000/questions/';
+      question_id = this.id;
+      finalUrl = url + question_id;
+
+      this.responsedata = await (await fetch(finalUrl)).json();
+    },
+
+    async prevQuestion() {
+      if(this.id > 1){
+        url = 'http://192.168.1.145:8000/questions/';
+        this.id -= 1;
+        question_id = this.id;
+        finalUrl = url + question_id;
+
+        this.responsedata = await (await fetch(finalUrl)).json();
+      }
+    },
+
+    async nextQuestion() {
+      if(this.id < (await (await fetch('http://192.168.1.145:8000/questions/')).json()).length){
+
+        url = 'http://192.168.1.145:8000/questions/';
+        this.id += 1;
+        question_id = this.id;
+        finalUrl = url + question_id;
+
+        this.responsedata = await (await fetch(finalUrl)).json();
+      }
+    }
+
+  }">
+
+    <h2 x-init="getQuestionById()">Vraag: <div x-text="responsedata.question"></div></h2>
+    <ul>
+        <li>A: <div x-text="responsedata.A_field"></div></li>
+        <li>B: <div x-text="responsedata.B_field"></div></li>
+        <li>C: <div x-text="responsedata.C_field"></div></li>
+        <li>D: <div x-text="responsedata.D_field"></div></li>
+    </ul>
+
+    <button type="submit" x-on:click="prevQuestion()">Vorige</button>
+    <div x-text="id"></div>
+    <button type="submit" x-on:click="nextQuestion()">Volgende</button>
+
+
+</div>
 
 </body>
 </html>
