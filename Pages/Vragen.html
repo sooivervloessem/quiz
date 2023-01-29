@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vragen</title>
+    <script type="text/javascript" src="static/cdn.min.js">
+    </script>
+
+</head>
+
+<body>
+
+<h1>Vragen</h1>
+
+<div id="all_questions" x-data="{
+        responsedata: null,
+
+        async get_questions() {
+            url = 'http://192.168.0.130:8000/questions/';
+            this.responsedata = await (await fetch(url)).json();
+
+            console.log(this.responsedata);
+        }
+    }">
+    <div>
+        <h2>Vraag alle vragen op</h2>
+        <button type="submit" x-on:click="get_questions()">Vraag alle vragen op</button>
+
+        <div x-show="responsedata">
+            <h3>Vragen:</h3>
+            <template x-for="question in responsedata">
+
+                <ul>
+                    <strong x-text="question.id + ' ' + question.question"></strong>
+                    <li x-text="'A: ' + question.A_field"></li>
+                    <li x-text="'B: ' + question.B_field"></li>
+                    <li x-text="'C: ' + question.C_field"></li>
+                    <li x-text="'D: ' + question.D_field"></li>
+                    <li x-text="'Antwoord: ' + question.solution"></li>
+                </ul>
+            </template>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div id="question_per_id" x-data="{
+        responsedata: null,
+        requestQuestionId: null,
+
+        async get_question_by_id() {
+            if ((this.requestQuestionId != null) && (this.requestQuestionId > 0) && (this.requestQuestionId < (await (await fetch('http://192.168.0.130:8000/questions/')).json()).length + 1)){
+                url = 'http://192.168.0.130:8000/questions/';
+                question_id = this.requestQuestionId;
+                finalUrl = url + question_id;
+                this.responsedata = await (await fetch(finalUrl)).json();
+
+                console.log(this.responsedata);
+            }
+        }
+    }">
+    <div>
+        <h2>Vraag een vraag op met het nummer</h2>
+        <input x-model="requestQuestionId" class="form-control" id="idInput" name="id">
+        <button type="submit" x-on:click="get_question_by_id()">Vraag op</button>
+
+        <div x-show="responsedata">
+            <strong x-text="responsedata.id + ' ' + responsedata.question"></strong>
+            <ul>
+                <li x-text="'A: ' + responsedata.A_field"></li>
+                <li x-text="'B: ' + responsedata.B_field"></li>
+                <li x-text="'C: ' + responsedata.C_field"></li>
+                <li x-text="'D: ' + responsedata.D_field"></li>
+                <li x-text="'Antwoord: ' + responsedata.solution"></li>
+            </ul>
+            </template>
+        </div>
+
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

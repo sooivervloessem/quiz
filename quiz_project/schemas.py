@@ -23,10 +23,10 @@ class QuestionBase(BaseModel):
     B_field: str
     C_field: str
     D_field: str
-
+    solution: str
 
 class QuestionCreate(QuestionBase):
-    solution: str
+    pass
 
 
 class Question(QuestionBase):
