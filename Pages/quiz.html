@@ -22,7 +22,7 @@
     responsedata: null,
 
     async getQuestionById() {
-      url = 'http://192.168.0.130:8000/questions/';
+      url = 'http://192.168.1.145:8000/questions/';
       question_id = this.id;
       finalUrl = url + question_id;
 
@@ -31,7 +31,7 @@
 
     async prevQuestion() {
       if(this.id > 1){
-        url = 'http://192.168.0.130:8000/questions/';
+        url = 'http://192.168.1.145:8000/questions/';
         this.id -= 1;
         question_id = this.id;
         finalUrl = url + question_id;
@@ -41,9 +41,9 @@
     },
 
     async nextQuestion() {
-      if(this.id < (await (await fetch('http://192.168.0.130:8000/questions/')).json()).length){
+      if(this.id < (await (await fetch('http://192.168.1.145:8000/questions/')).json()).length){
 
-        url = 'http://192.168.0.130:8000/questions/';
+        url = 'http://192.168.1.145:8000/questions/';
         this.id += 1;
         question_id = this.id;
         finalUrl = url + question_id;

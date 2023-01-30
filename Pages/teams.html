@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teams</title>
+    <script type="text/javascript" src="static/cdn.min.js">
+    </script>
+
+</head>
+
+<body>
+
+<h1>Teams</h1>
+
+<div id="all_teams" x-data="{
+        responsedata: null,
+
+        async get_teams() {
+            url = 'http://192.168.1.145:8000/teams/';
+            this.responsedata = await (await fetch(url)).json();
+
+            console.log(this.responsedata);
+        }
+    }">
+    <div>
+        <h2>Vraag alle Teams op</h2>
+        <button type="submit" x-on:click="get_teams()">Vraag alle Teams op</button>
+
+        <div x-show="responsedata">
+            <h3>Teams:</h3>
+            <template x-for="team in responsedata">
+
+                <ul>
+                    <li x-text="'Teamnummer: ' + team.id"></li>
+                    <li x-text="'Naam: ' + team.name"></li>
+                    <li x-text="'Score: ' + team.score"></li>
+                </ul>
+            </template>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div id="team_per_id" x-data="{
+        responsedata: null,
+        requestteamId: null,
+
+        async get_team_by_id() {
+            if ((this.requestteamId != null) && (this.requestteamId > 0) && (this.requestteamId < (await (await fetch('http://192.168.1.145:8000/teams/')).json()).length + 1)){
+                url = 'http://192.168.1.145:8000/teams/';
+                team_id = this.requestteamId;
+                finalUrl = url + team_id;
+                this.responsedata = await (await fetch(finalUrl)).json();
+
+                console.log(this.responsedata);
+            }
+            else{
+                alert('Dit team bestaat niet');
+            }
+        }
+    }">
+    <div>
+        <h2>Vraag een Team op met het nummer</h2>
+        <input x-model="requestteamId" class="form-control" id="idInput" name="id">
+        <button type="submit" x-on:click="get_team_by_id()">Vraag op</button>
+
+        <div x-show="responsedata">
+            <ul>
+                <li x-text="'Teamnummer: ' + responsedata.id"></li>
+                <li x-text="'Naam: ' + responsedata.name"></li>
+                <li x-text="'Score: ' + responsedata.score"></li>
+            </ul>
+            </template>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div id="create_team" x-data="{
+        responsedata: null,
+        team_name: null,
+
+        async create_team() {
+            if ((this.team_name) != null){
+                url = 'http://192.168.1.145:8000/teams/';
+                this.responsedata = await (await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: this.team_name,
+                    }),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+
+                })).json();
+
+                console.log(this.responsedata);
+
+                alert('Team succesvol aangemaakt!');
+                this.team_name = null;
+            }
+            else{
+                alert('Voer een naam in!');
+            }
+        }
+    }">
+    <div class="card no-max-width">
+        <div class="card-header">
+            <h2>Maak een Team aan</h2>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><input placeholder="Teamnaam" x-model="team_name" class="form-control"
+                                               id="team_name"></li>
+        </ul>
+        <button type="submit" x-on:click="create_team()">Maak aan</button>
+
+    </div>
+</div>
+
+
+
+
+
+<div id="update_team" x-data="{
+        responsedata: null,
+        requestteamId: null,
+        team_name: null,
+
+        async update_team() {
+            if ((this.requestteamId != null) && (this.requestteamId > 0) && (this.requestteamId < (await (await fetch('http://192.168.1.145:8000/teams/')).json()).length + 1)){
+                if (this.team_name != null){
+                url = 'http://192.168.1.145:8000/teams/';
+                team_id = this.requestteamId;
+                finalUrl = url + team_id;
+                this.responsedata = await (await fetch(finalUrl, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        name: this.team_name,
+                    }),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+
+                })).json();
+
+                console.log(this.responsedata);
+
+                alert('Team succesvol aangepast!');
+                this.team_name = null;
+                }
+                else {
+                    alert('Vul een teamnaam in!');
+                }
+            }
+            else{
+                alert('Dit team bestaat niet');
+            }
+        }
+    }">
+    <div class="card no-max-width">
+        <div class="card-header">
+            <h2>Pas een Team aan</h2>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><input placeholder="Teamnummer" x-model="requestteamId" class="form-control"
+                                               id="idInput" name="id"></li>
+            <li class="list-group-item"><input placeholder="Teamnaam" x-model="team_name" class="form-control"
+                                               id="teamNameInput" name="team_name"></li>
+        </ul>
+        <button type="submit" x-on:click="update_team()">Pas aan</button>
+
+    </div>
+</div>
+
+
+<div id="delete_team_by_id" x-data="{
+        responsedata: null,
+        requestteamId: null,
+
+        async delete_team_by_id() {
+            if ((this.requestteamId != null) && (this.requestteamId > 0) && (this.requestteamId < (await (await fetch('http://192.168.1.145:8000/teams/')).json()).length + 1)){
+                url = 'http://192.168.1.145:8000/teams/';
+                team_id = this.requestteamId;
+                finalUrl = url + team_id;
+                this.responsedata = await (await fetch(finalUrl, {
+                    method: 'DELETE',
+                })).json();
+
+                console.log(this.responsedata);
+
+                alert('Team succesvol verwijdert');
+            }
+            else{
+                alert('Dit team bestaat niet');
+            }
+        }
+    }">
+    <div>
+        <h2>Verwijder een Team met het nummer</h2>
+        <input x-model="requestteamId" class="form-control" id="idInput" name="id">
+        <button type="submit" x-on:click="delete_team_by_id()">Verwijder</button>
+
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vragen</title>
+    <script type="text/javascript" src="static/cdn.min.js">
+    </script>
+
+</head>
+
+<body>
+
+<h1>Vragen</h1>
+
+<div id="all_questions" x-data="{
+        responsedata: null,
+
+        async get_questions() {
+            url = 'http://192.168.1.145:8000/questions/';
+            this.responsedata = await (await fetch(url)).json();
+
+            console.log(this.responsedata);
+        }
+    }">
+    <div>
+        <h2>Vraag alle vragen op</h2>
+        <button type="submit" x-on:click="get_questions()">Vraag alle vragen op</button>
+
+        <div x-show="responsedata">
+            <h3>Vragen:</h3>
+            <template x-for="question in responsedata">
+
+                <ul>
+                    <strong x-text="question.id + ' ' + question.question"></strong>
+                    <li x-text="'A: ' + question.A_field"></li>
+                    <li x-text="'B: ' + question.B_field"></li>
+                    <li x-text="'C: ' + question.C_field"></li>
+                    <li x-text="'D: ' + question.D_field"></li>
+                    <li x-text="'Antwoord: ' + question.solution"></li>
+                </ul>
+            </template>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div id="question_per_id" x-data="{
+        responsedata: null,
+        requestQuestionId: null,
+
+        async get_question_by_id() {
+            if ((this.requestQuestionId != null) && (this.requestQuestionId > 0) && (this.requestQuestionId < (await (await fetch('http://192.168.1.145:8000/questions/')).json()).length + 1)){
+                url = 'http://192.168.1.145:8000/questions/';
+                question_id = this.requestQuestionId;
+                finalUrl = url + question_id;
+                this.responsedata = await (await fetch(finalUrl)).json();
+
+                console.log(this.responsedata);
+            }
+            else{
+                alert('Deze vraag bestaat niet');
+            }
+        }
+    }">
+    <div>
+        <h2>Vraag een vraag op met het nummer</h2>
+        <input x-model="requestQuestionId" class="form-control" id="idInput" name="id">
+        <button type="submit" x-on:click="get_question_by_id()">Vraag op</button>
+
+        <div x-show="responsedata">
+            <strong x-text="responsedata.id + ' ' + responsedata.question"></strong>
+            <ul>
+                <li x-text="'A: ' + responsedata.A_field"></li>
+                <li x-text="'B: ' + responsedata.B_field"></li>
+                <li x-text="'C: ' + responsedata.C_field"></li>
+                <li x-text="'D: ' + responsedata.D_field"></li>
+                <li x-text="'Antwoord: ' + responsedata.solution"></li>
+            </ul>
+            </template>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div id="create_question" x-data="{
+        responsedata: null,
+        question_post: null,
+        A_field_post: null,
+        B_field_post: null,
+        C_field_post: null,
+        D_field_post: null,
+        solution_post: null,
+
+        async create_question() {
+            if ((this.question_post && A_field_post && B_field_post && C_field_post && D_field_post && solution_post) != null){
+                url = 'http://192.168.1.145:8000/questions/';
+                this.responsedata = await (await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        question: this.question_post,
+                        A_field: this.A_field_post,
+                        B_field: this.B_field_post,
+                        C_field: this.C_field_post,
+                        D_field: this.D_field_post,
+                        solution: this.solution_post,
+                    }),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+
+                })).json();
+
+                console.log(this.responsedata);
+
+                alert('Vraag succesvol aangemaakt!');
+                this.question_post = null;
+                this.A_field_post = null;
+                this.B_field_post = null;
+                this.C_field_post = null;
+                this.D_field_post = null;
+                this.solution_post = null;
+            }
+            else{
+                alert('Voer alle opties in!');
+            }
+        }
+    }">
+    <div class="card no-max-width">
+        <div class="card-header">
+            <h2>Maak een vraag aan</h2>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><input placeholder="Vraag" x-model="question_post" class="form-control"
+                                               id="question_post"></li>
+            <li class="list-group-item"><input placeholder="Antwoord A" x-model="A_field_post" class="form-control"
+                                               id="A_field_post"></li>
+            <li class="list-group-item"><input placeholder="Antwoord B" x-model="B_field_post" class="form-control"
+                                               id="B_field_post"></li>
+            <li class="list-group-item"><input placeholder="Antwoord C" x-model="C_field_post" class="form-control"
+                                               id="C_field_post"></li>
+            <li class="list-group-item"><input placeholder="Antwoord D" x-model="D_field_post" class="form-control"
+                                               id="D_field_post"></li>
+            <li class="list-group-item"><input placeholder="Oplossingsletter" x-model="solution_post" class="form-control"
+                                               id="solution_post"></li>
+        </ul>
+        <button type="submit" x-on:click="create_question()">Maak aan</button>
+
+    </div>
+</div>
+
+
+
+
+
+<div id="update_question" x-data="{
+        responsedata: null,
+        requestQuestionId: null,
+        question: null,
+        A_field: null,
+        B_field: null,
+        C_field: null,
+        D_field: null,
+        solution: null,
+
+        async update_question() {
+            if ((this.requestQuestionId != null) && (this.requestQuestionId > 0) && (this.requestQuestionId < (await (await fetch('http://192.168.1.145:8000/questions/')).json()).length + 1)){
+                url = 'http://192.168.1.145:8000/questions/';
+                question_id = this.requestQuestionId;
+                finalUrl = url + question_id;
+                this.responsedata = await (await fetch(finalUrl, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        question: this.question,
+                        A_field: this.A_field,
+                        B_field: this.B_field,
+                        C_field: this.C_field,
+                        D_field: this.D_field,
+                        solution: this.solution,
+                    }),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+
+                })).json();
+
+                console.log(this.responsedata);
+
+                alert('Vraag succesvol aangepast!');
+                this.question = null;
+                this.A_field = null;
+                this.B_field = null;
+                this.C_field = null;
+                this.D_field = null;
+                this.solution = null;
+            }
+            else{
+                alert('Deze vraag bestaat niet');
+            }
+        }
+    }">
+    <div class="card no-max-width">
+        <div class="card-header">
+            <h2>Pas een vraag aan</h2>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><input placeholder="Vraagnummer" x-model="requestQuestionId"
+                                               class="form-control" id="idInput" name="id"></li>
+            <li class="list-group-item"><input placeholder="Vraag" x-model="question" class="form-control"
+                                               id="question"></li>
+            <li class="list-group-item"><input placeholder="Antwoord A" x-model="A_field" class="form-control"
+                                               id="A_field"></li>
+            <li class="list-group-item"><input placeholder="Antwoord B" x-model="B_field" class="form-control"
+                                               id="B_field"></li>
+            <li class="list-group-item"><input placeholder="Antwoord C" x-model="C_field" class="form-control"
+                                               id="C_field"></li>
+            <li class="list-group-item"><input placeholder="Antwoord D" x-model="D_field" class="form-control"
+                                               id="D_field"></li>
+            <li class="list-group-item"><input placeholder="Oplossingsletter" x-model="solution" class="form-control"
+                                               id="solution"></li>
+        </ul>
+        <button type="submit" x-on:click="update_question()">Pas aan</button>
+
+    </div>
+</div>
+
+
+<div id="delete_question_by_id" x-data="{
+        responsedata: null,
+        requestQuestionId: null,
+
+        async delete_question_by_id() {
+            if ((this.requestQuestionId != null) && (this.requestQuestionId > 0) && (this.requestQuestionId < (await (await fetch('http://192.168.1.145:8000/questions/')).json()).length + 1)){
+                url = 'http://192.168.1.145:8000/questions/';
+                question_id = this.requestQuestionId;
+                finalUrl = url + question_id;
+                this.responsedata = await (await fetch(finalUrl, {
+                    method: 'DELETE',
+                })).json();
+
+                console.log(this.responsedata);
+
+                alert('Vraag succesvol verwijdert');
+            }
+            else{
+                alert('Deze vraag bestaat niet');
+            }
+        }
+    }">
+    <div>
+        <h2>Verwijder een vraag met het nummer</h2>
+        <input x-model="requestQuestionId" class="form-control" id="idInput" name="id">
+        <button type="submit" x-on:click="delete_question_by_id()">Verwijder</button>
+
+
+    </div>
+</div>
+
+
+</body>
+
+</html>

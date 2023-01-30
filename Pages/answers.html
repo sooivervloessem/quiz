@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Antwoorden</title>
+    <script type="text/javascript" src="static/cdn.min.js">
+    </script>
+
+</head>
+
+<body>
+
+<h1>Antwoorden</h1>
+
+<div id="all_answers_by_question_id" x-data="{
+        responsedata: null,
+        requestAnswerId: null,
+
+        async get_answers_by_question_id() {
+
+            if ((this.requestAnswerId != null) && (this.requestAnswerId > 0) && (this.requestAnswerId < (await (await fetch('http://192.168.1.145:8000/questions/')).json()).length + 1)){
+            url = 'http://192.168.1.145:8000/answer/question/';
+            id = this.requestAnswerId;
+            finalUrl = url + id;
+            this.responsedata = await (await fetch(finalUrl)).json();
+
+            console.log(this.responsedata);
+            }
+            else {
+                alert('Die vraag bestaat niet!');
+            }
+        }
+    }">
+    <div>
+        <h2>Vraag antwoorden op per vraagnummer</h2>
+        <input x-model="requestAnswerId" class="form-control" id="idInput" name="id">
+        <button type="submit" x-on:click="get_answers_by_question_id()">Vraag alle antwoorden op</button>
+
+        <div x-show="responsedata">
+            <h3>Antwoorden op vraag <span x-text="requestAnswerId"></span>:</h3>
+            <template
+                    x-for="(item, key) in Object.entries(responsedata).sort((a, b) => a[1]['team_id'] - b[1]['team_id'])">
+                <ul>
+
+                    <li x-text="'Teamnummer: ' + item[1].team_id"></li>
+                    <li
+                            x-text="'Teamnaam: ' + (await (await fetch('http://192.168.1.145:8000/teams/' + item[1].team_id)).json()).name">
+                    </li>
+                    <li x-text="'Antwoord: ' + item[1].answer"></li>
+
+                </ul>
+            </template>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div id="all_answers_by_team_id" x-data="{
+        responsedata: null,
+        requestAnswerId: null,
+
+        async get_answers_by_team_id() {
+
+            if ((this.requestAnswerId != null) && (this.requestAnswerId > 0) && (this.requestAnswerId < (await (await fetch('http://192.168.1.145:8000/teams/')).json()).length + 1)){
+            url = 'http://192.168.1.145:8000/answer/team/';
+            id = this.requestAnswerId;
+            finalUrl = url + id;
+            this.responsedata = await (await fetch(finalUrl)).json();
+
+            console.log(this.responsedata);
+            }
+            else {
+                alert('Dat team bestaat niet!');
+            }
+        }
+    }">
+    <div>
+        <h2>Vraag antwoorden op per teamnummer</h2>
+        <input x-model="requestAnswerId" class="form-control" id="idInput" name="id">
+        <button type="submit" x-on:click="get_answers_by_team_id()">Vraag alle antwoorden op</button>
+
+        <div x-show="responsedata">
+            <h3>Antwoorden voor team <span x-text="requestAnswerId"></span>:</h3>
+            <template
+                    x-for="(item, key) in Object.entries(responsedata).sort((a, b) => a[1]['question_id'] - b[1]['question_id'])">
+                <ul>
+                    <li
+                            x-text="'Vraag: ' + (await (await fetch('http://192.168.1.145:8000/questions/' + item[1].question_id)).json()).question">
+                    </li>
+                    <li x-text="'Vraagnummer: ' + item[1].question_id"></li>
+                    <li x-text="'Antwoord: ' + item[1].answer"></li>
+                </ul>
+            </template>
+        </div>
+
+
+    </div>
+</div>
+
+</body>
+
+</html>
