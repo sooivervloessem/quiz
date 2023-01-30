@@ -140,8 +140,8 @@ def get_answers_by_team_id(team_id: int, db: Session = Depends(get_db)):
     return crud.get_answers_by_team_id(db=db, team_id=team_id)
 
 
-@app.patch("/score/{team_id}")
-def update_score_by_team_id(team_id: int, score: int, db: Session = Depends(get_db)):
+@app.patch("/score/{team_id}/")
+def update_score_by_team_id(team_id: int, score: str, db: Session = Depends(get_db)):
     return crud.update_score_by_team_id(db=db, team_id=team_id, score=score)
 
 
@@ -183,8 +183,6 @@ def delete_team_by_id(team_id: int, db: Session = Depends(get_db)):
 def get_question_id(db: Session = Depends(get_db)):
     return current_question_id
 
-
-#@app.put("/question_id/{question_id}/")
-#def update_question_id(question_id: int, db: Session = Depends(get_db)):
-#    return crud.update_question_id(db=db, question_id=question_id)
-
+@app.delete("/answers/")
+def delete_answers(db: Session = Depends(get_db)):
+    return crud.delete_answers(db=db)

@@ -1,0 +1,42 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 20px;
+}
+
+body {
+    text-align: center;
+    justify-content: center;
+    padding-top: 5px;
+}
+
+ul {
+    justify-content: center;
+    text-align: center;
+    padding: 0;
+}
+
+li {
+    list-style-type: none;
+}
+
+.flex {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex: 1 1 auto;
+}
+
+.center {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.align-left {
+    text-align: left;
+}

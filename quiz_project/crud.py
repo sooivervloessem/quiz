@@ -122,9 +122,9 @@ def get_answers_by_team_id(db: Session, team_id: int):
     return db.query(models.Answer).filter(models.Answer.team_id == team_id).all()
 
 
-def update_score_by_team_id(db: Session, team_id: int, score: int):
+def update_score_by_team_id(db: Session, team_id: int, score: str):
     db_score = db.get(models.Team, team_id)
-    setattr(db_score, "score", score)
+    setattr(db_score, "score", int(score))
     db.add(db_score)
     db.commit()
     db.refresh(db_score)
@@ -133,3 +133,9 @@ def update_score_by_team_id(db: Session, team_id: int, score: int):
 
 def get_score_by_team_id(db: Session, team_id: int):
     return db.query(models.Team.score).filter(models.Team.id == team_id).first()
+
+
+def delete_answers(db: Session):
+    db.query(models.Answer).delete()
+    db.commit()
+    return {"All answers have been deleted": True}

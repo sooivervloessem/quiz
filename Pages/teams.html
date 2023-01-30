@@ -7,10 +7,37 @@
     <title>Teams</title>
     <script type="text/javascript" src="static/cdn.min.js">
     </script>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
 
 </head>
 
 <body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #e3f2fd;">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <a class="navbar-brand" href="index.html">AH2</a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">Startpagina</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="quiz.html">Quiz spelen</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link active" href="#">Receptie</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="vragen.html">Vragen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="answers.html">Antwoorden</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 
 <h1>Teams</h1>
 
@@ -129,8 +156,10 @@
 
 <div id="update_team" x-data="{
         responsedata: null,
+        responsedata_score: null,
         requestteamId: null,
         team_name: null,
+        team_score: null,
 
         async update_team() {
             if ((this.requestteamId != null) && (this.requestteamId > 0) && (this.requestteamId < (await (await fetch('http://192.168.1.145:8000/teams/')).json()).length + 1)){
@@ -149,7 +178,12 @@
 
                 })).json();
 
-                console.log(this.responsedata);
+                url_score = 'http://192.168.1.145:8000/score/';
+                finalUrl_score = url_score + this.requestteamId + '/?score=' + this.team_score;
+
+                this.responsedata_score = await (await fetch(finalUrl_score, {
+                    method: 'PATCH',
+                })).json();
 
                 alert('Team succesvol aangepast!');
                 this.team_name = null;
@@ -162,6 +196,7 @@
                 alert('Dit team bestaat niet');
             }
         }
+
     }">
     <div class="card no-max-width">
         <div class="card-header">
@@ -172,6 +207,8 @@
                                                id="idInput" name="id"></li>
             <li class="list-group-item"><input placeholder="Teamnaam" x-model="team_name" class="form-control"
                                                id="teamNameInput" name="team_name"></li>
+            <li class="list-group-item"><input placeholder="Score (optioneel)" x-model="team_score"
+                                               class="form-control" id="teamScoreInput" name="team_score"></li>
         </ul>
         <button type="submit" x-on:click="update_team()">Pas aan</button>
 
@@ -194,7 +231,7 @@
 
                 console.log(this.responsedata);
 
-                alert('Team succesvol verwijdert');
+                alert('Team succesvol verwijderd');
             }
             else{
                 alert('Dit team bestaat niet');

@@ -1,14 +1,112 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home</title>
     <script type="text/javascript" src="static/cdn.min.js">
     </script>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+
+
 
 </head>
+
 <body>
 
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #e3f2fd;">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <a class="navbar-brand" href="#">AH2</a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link active" href="#">Startpagina</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="quiz.html">Quiz spelen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="teams.html">Receptie</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="vragen.html">Vragen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="answers.html">Antwoorden</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+
+<h1>Startpagina</h1>
+
+
+
+<div id="delete_all_questions" x-data="{
+    responsedata: null,
+
+    async delete_all_questions() {
+        url = 'http://192.168.1.145:8000/questions/all';
+        this.responsedata = await (await fetch(url{
+          method: 'DELETE',
+      })).json();
+
+        alert('Alle vragen zijn succesvol verwijderd');
+    }
+}">
+    <div>
+        <h2>Verwijder alle vragen</h2>
+        <button type="submit" x-on:click="delete_all_questions()">Verwijder alle vragen</button>
+
+
+    </div>
+</div>
+
+<div id="delete_all_teams" x-data="{
+    responsedata: null,
+
+    async delete_all_teams() {
+        url = 'http://192.168.1.145:8000/teams/all';
+        this.responsedata = await (await fetch(url{
+          method: 'DELETE',
+      })).json();
+
+        alert('Alle teams zijn succesvol verwijderd');
+    }
+}">
+    <div>
+        <h2>Verwijder alle teams</h2>
+        <button type="submit" x-on:click="delete_all_teams)">Verwijder alle teams</button>
+
+
+    </div>
+</div>
+
+<div id="delete_all_answers" x-data="{
+    responsedata: null,
+
+    async delete_all_answers() {
+        url = 'http://192.168.1.145:8000/answers/all';
+        this.responsedata = await (await fetch(url{
+          method: 'DELETE',
+      })).json();
+
+        alert('Alle antwoorden zijn succesvol verwijderd');
+    }
+}">
+    <div>
+        <h2>Verwijder alle antwoorden</h2>
+        <button type="submit" x-on:click="delete_all_answers()">Verwijder alle antwoorden</button>
+
+
+    </div>
+</div>
+<script src="static/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

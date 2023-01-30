@@ -1,14 +1,45 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Quizmaster</title>
     <script type="text/javascript" src="static/cdn.min.js">
     </script>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styling.css">
 
 </head>
+
 <body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #e3f2fd;">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
+            aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <a class="navbar-brand" href="index.html">AH2</a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">Startpagina</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link active" href="#">Quiz spelen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="teams.html">Receptie</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="vragen.html">Vragen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="answers.html">Antwoorden</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 
 <h1>Quizmaster</h1>
 
@@ -20,6 +51,7 @@
     C_field: null,
     D_field: null,
     responsedata: null,
+    responsedata_score: null,
 
     async getQuestionById() {
       url = 'http://192.168.1.145:8000/questions/';
@@ -50,24 +82,53 @@
 
         this.responsedata = await (await fetch(finalUrl)).json();
       }
+    },
+
+    async get_scores() {
+        url = 'http://192.168.1.145:8000/teams/';
+        this.responsedata_score = await (await fetch(url)).json();
+
+        console.log(this.responsedata_score);
     }
 
   }">
 
-    <h2 x-init="getQuestionById()">Vraag: <div x-text="responsedata.question"></div></h2>
-    <ul>
-        <li>A: <div x-text="responsedata.A_field"></div></li>
-        <li>B: <div x-text="responsedata.B_field"></div></li>
-        <li>C: <div x-text="responsedata.C_field"></div></li>
-        <li>D: <div x-text="responsedata.D_field"></div></li>
-    </ul>
+    <h2 x-init="getQuestionById()">Vraag: <div x-text="responsedata.question"></div>
+    </h2>
+    <div class="center d-inline-block">
+        <ul>
+      <span class="align-left">
+      <li>A: <span x-text="responsedata.A_field"></span>
+      </li>
+      <li>B: <span x-text="responsedata.B_field"></span>
+      </li>
+      <li>C: <span x-text="responsedata.C_field"></span>
+      </li>
+      <li>D: <span x-text="responsedata.D_field"></span>
+      </li>
+    </span>
+        </ul>
+    </div>
 
-    <button type="submit" x-on:click="prevQuestion()">Vorige</button>
-    <div x-text="id"></div>
-    <button type="submit" x-on:click="nextQuestion()">Volgende</button>
 
+    <div class="flex">
+        <button type="submit" x-on:click="prevQuestion(); get_scores()" class="btn btn-primary mx-1">Vorige</button>
+        <div x-text="id" class="mx-1"></div>
+        <button type="submit" x-on:click="nextQuestion(); get_scores()" class="btn btn-primary mx-1">Volgende</button>
+    </div>
+
+    <h2 class="mt-5">Tussenstand</h2>
+    <div x-init="get_scores()" x-show="responsedata_score">
+        <h3>Teams:</h3>
+        <template x-for="team in responsedata_score">
+            <ul>
+                <li x-text="team.name + ' - ' + team.score"></li>
+            </ul>
+        </template>
+    </div>
 
 </div>
 
 </body>
+
 </html>
